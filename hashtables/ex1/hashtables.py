@@ -19,6 +19,7 @@ class HashTable:
         self.storage = [None] * capacity
 
 
+
 # Hash int
 def hash(x, max):
     x = ((x >> 16) ^ x) * 0x45d9f3b
