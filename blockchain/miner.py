@@ -26,8 +26,21 @@ def proof_of_work(last_proof):
     print("Searching for next proof")
     proof = 0
     #  TODO: Your code here
+    low_proof = last_proof
+    high_proof = last_proof
+    proof = 0
+    while valid_proof(last_proof, low_proof) is False and valid_proof(last_proof, high_proof) is False:
+        low_proof -= 1
+        high_proof += 1
+
+        if valid_proof(last_proof, high_proof) is True:
+            proof = high_proof
+        elif valid_proof(last_proof, low_proof) is True:
+            proof = low_proof
 
     print("Proof found: " + str(proof) + " in " + str(timer() - start))
+
+
     return proof
 
 
@@ -35,12 +48,15 @@ def valid_proof(last_hash, proof):
     """
     Validates the Proof:  Multi-ouroborus:  Do the last six characters of
     the hash of the last proof match the first six characters of the proof?
-
     IE:  last_hash: ...AE9123456, new hash 123456888...
     """
 
-    # TODO: Your code here!
-    pass
+    guess = f"{proof}".encode()
+    guess_hash = hashlib.sha256(guess).hexdigest()
+    last_hash = str(last_hash).encode()
+    last_hash = hashlib.sha256(last_hash).hexdigest()
+
+    return guess_hash[:6] == last_hash[-6:]
 
 
 if __name__ == '__main__':
@@ -67,7 +83,6 @@ if __name__ == '__main__':
         r = requests.get(url=node + "/last_proof")
         data = r.json()
         new_proof = proof_of_work(data.get('proof'))
-
         post_data = {"proof": new_proof,
                      "id": id}
 
